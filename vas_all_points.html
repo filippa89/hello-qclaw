@@ -19,7 +19,7 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif}
 #panel li .n{font-size:11px}
 #panel li .a{color:#aaa;font-size:9px}
 #panel li.in5{border-left:3px solid #4caf50}
-#panel li.out5{border-left:3px solid #666}
+#panel li.out5{border-left:3px solid #3b82f6}
 .leaflet-tooltip.marker-label{background:transparent;border:none;box-shadow:none;color:#222;font-size:10px;font-weight:bold;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff;padding:0;white-space:nowrap}
 .leaflet-tooltip.marker-label::before{display:none}
 @media(max-width:600px){#panel{width:240px}}
@@ -43,7 +43,7 @@ L.circle(CENTER,{radius:5000,color:'#ff9800',weight:2,fillOpacity:0.04,dashArray
 var inCount = 0, outCount = 0;
 var list = document.getElementById('list');
 POINTS.forEach(function(p){
-    var color = p.in5km ? '#4caf50' : '#555555';
+    var color = p.in5km ? '#4caf50' : '#3b82f6';
     var size = p.in5km ? 6 : 5;
     var fop = p.in5km ? 0.7 : 0.85;
     var m = L.circleMarker([p.lat,p.lon],{radius:size,color:color,fillColor:color,fillOpacity:fop,weight:1.5,opacity:0.9}).addTo(map)
@@ -57,7 +57,7 @@ POINTS.forEach(function(p){
     li.onclick = function(){ map.setView([p.lat,p.lon],15); m.openPopup(); };
     list.appendChild(li);
 });
-document.getElementById('sum').innerHTML = '共<b> 116 </b>个点位 | 🟢 5km内 <b>'+inCount+'</b> 个 | ⚫ 5km外 <b>'+outCount+'</b> 个';
+document.getElementById('sum').innerHTML = '共<b> 116 </b>个点位 | 🟢 5km内 <b>'+inCount+'</b> 个 | 🔵 5km外 <b>'+outCount+'</b> 个';
 map.fitBounds([[31.1,121.35],[31.3,121.7]]);
 </script>
 </body>
