@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>瓦肆VAS EST · 周边5km点位</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif}
+#container{width:100vw;height:100vh}
+#panel{position:absolute;top:10px;left:10px;z-index:999;background:rgba(0,0,0,0.82);color:#fff;padding:14px 18px;border-radius:10px;font-size:12px;width:290px;max-height:95vh;overflow-y:auto}
+#panel h3{margin-bottom:4px;font-size:14px;color:#ff9800}
+#panel .summary{color:#aaa;margin-bottom:8px;font-size:11px}
+#panel ul{list-style:none}
+#panel li{padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07);line-height:1.4;cursor:pointer;transition:background .2s}
+#panel li:hover{background:rgba(255,255,255,0.05)}
+#panel li .d{color:#4caf50;font-weight:bold;font-size:11px}
+#panel li .n{font-weight:bold;font-size:12px}
+#panel li .a{color:#aaa;font-size:10px}
+@media(max-width:600px){#panel{width:240px;font-size:11px}}
+</style>
+</head>
+<body>
+<div id="container"></div>
+<div id="panel"><h3>📍 瓦肆VAS EST 周边5km</h3><div class="summary">共 <b>30</b> 个点位 | 点击名称定位</div><ul id="list"></ul></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+var CENTER = [31.161753, 121.465197];
+var POINTS = [{"name": "il colpo bis·程Studio(AI PLAZA西岸凤巢店)", "address": "云锦路683号4F", "lat": 31.163734, "lon": 121.460038, "distance": 0.538, "in_range": true, "type": "美容美发", "area": "西岸凤巢"}, {"name": "蘭心·玥笙荟", "address": "云锦路683号6F", "lat": 31.163734, "lon": 121.460038, "distance": 0.538, "in_range": true, "type": "中餐厅", "area": "西岸凤巢"}, {"name": "鲜啤30公里酒馆", "address": "凯滨路38号LG层D04", "lat": 31.179206, "lon": 121.458587, "distance": 2.04, "in_range": true, "type": "酒吧", "area": "阳光滨江天地·尚湾里"}, {"name": "思妍丽(东安路店)", "address": "东安路800弄12号102室", "lat": 31.18159, "lon": 121.458398, "distance": 2.299, "in_range": true, "type": "美容护肤", "area": "东安路"}, {"name": "香港龙码头螃蟹王", "address": "瑞平路230号2F", "lat": 31.181682, "lon": 121.455078, "distance": 2.416, "in_range": true, "type": "中餐厅", "area": "保利时光里"}, {"name": "紫琪尔胸部养护中心", "address": "瑞平路99号105室", "lat": 31.182679, "lon": 121.457413, "distance": 2.442, "in_range": true, "type": "美容护肤", "area": "龙华/西岸"}, {"name": "BEAUTY HAIR GANO(绿地缤纷城店)", "address": "瑞平路88号绿地缤纷城西区5F", "lat": 31.18342, "lon": 121.456403, "distance": 2.55, "in_range": true, "type": "美容美发", "area": "绿地缤纷城"}, {"name": "兰荷视光眼科", "address": "龙华中路600号5F(B座)", "lat": 31.186015, "lon": 121.45833, "distance": 2.776, "in_range": true, "type": "眼科", "area": "正大乐城"}, {"name": "凯丽Clean Massage(徐汇正大乐城店)", "address": "中山南二路679号2F", "lat": 31.187065, "lon": 121.458429, "distance": 2.887, "in_range": true, "type": "美容护肤", "area": "正大乐城"}, {"name": "众合口腔", "address": "龙华东路810号2F", "lat": 31.193014, "lon": 121.473475, "distance": 3.564, "in_range": true, "type": "齿科", "area": "绿地缤纷城"}, {"name": "浦发银行（东安支行）", "address": "斜土路2109号", "lat": 31.193542, "lon": 121.450111, "distance": 3.815, "in_range": true, "type": "私人银行", "area": ""}, {"name": "REAL瑞格医疗美容(徐汇店)", "address": "漕宝路111号", "lat": 31.167798, "lon": 121.42453, "distance": 3.927, "in_range": true, "type": "医学美容", "area": "天运综合大楼"}, {"name": "REAL瑞格医疗美容(徐汇店)", "address": "漕宝路111号1F", "lat": 31.167798, "lon": 121.42453, "distance": 3.927, "in_range": true, "type": "医学美容", "area": "天运综合大楼"}, {"name": "南洋1931", "address": "裕德路111号2F", "lat": 31.185966, "lon": 121.433133, "distance": 4.069, "in_range": true, "type": "商场", "area": "南洋1931"}, {"name": "翡立思医疗美容", "address": "蒲汇塘路100号3F", "lat": 31.186741, "lon": 121.433634, "distance": 4.091, "in_range": true, "type": "医疗美容", "area": "光启城"}, {"name": "香港龙码头螃蟹王", "address": "中山南一路788号2F", "lat": 31.197116, "lon": 121.480438, "distance": 4.191, "in_range": true, "type": "中餐厅", "area": "博荟广场"}, {"name": "CICI纤美·超模同款 科技瘦身(光启城店)", "address": "宜山路455号光启城时尚购物中心C区B1层79-81号", "lat": 31.183919, "lon": 121.428514, "distance": 4.273, "in_range": true, "type": "美容护肤", "area": "光启城时尚购物中心"}, {"name": "青松城大酒店", "address": "肇嘉浜路777号", "lat": 31.198497, "lon": 121.4494, "distance": 4.353, "in_range": true, "type": "五星酒店/高档", "area": ""}, {"name": "周斐斐口腔诊所", "address": "肇嘉浜路1000号2F", "lat": 31.195262, "lon": 121.440244, "distance": 4.418, "in_range": true, "type": "齿科", "area": "汇金百货"}, {"name": "THAIBEAULL", "address": "肇嘉浜路1000号2F", "lat": 31.195262, "lon": 121.440244, "distance": 4.418, "in_range": true, "type": "美容护肤", "area": "汇金百货"}, {"name": "东瀛国际造型", "address": "肇嘉浜路1000号4F", "lat": 31.195262, "lon": 121.440244, "distance": 4.418, "in_range": true, "type": "美容美发", "area": "汇金百货"}, {"name": "恒悦轩精致香港粤菜", "address": "宛平路290号2F 208", "lat": 31.197404, "lon": 121.443624, "distance": 4.464, "in_range": true, "type": "中餐厅", "area": "徐家汇公园"}, {"name": "江月楼", "address": "天平路185号天平宾馆3F", "lat": 31.197496, "lon": 121.439388, "distance": 4.672, "in_range": true, "type": "中餐厅", "area": "上海天平宾馆"}, {"name": "美豪丽致酒店", "address": "建国西路691号4F", "lat": 31.199955, "lon": 121.444445, "distance": 4.684, "in_range": true, "type": "四星酒店/舒适", "area": ""}, {"name": "菲登健身", "address": "徐虹北路20号1F", "lat": 31.189912, "lon": 121.427722, "distance": 4.745, "in_range": true, "type": "健身中心", "area": "徐虹北路"}, {"name": "香港日置名媛美容瘦身", "address": "华山路1901号LG2F", "lat": 31.197822, "lon": 121.437905, "distance": 4.778, "in_range": true, "type": "美容护肤", "area": "OneITC"}, {"name": "海菲秀·GLAMOUR 格莱美科技美肤中心(黄浦店)", "address": "半淞园路623号", "lat": 31.198982, "lon": 121.493283, "distance": 4.927, "in_range": true, "type": "美容护肤", "area": "世博会馆"}, {"name": "亮朵新理念视光中心", "address": "襄阳南路500号巴黎时韵大厦3楼308室", "lat": 31.205645, "lon": 121.457919, "distance": 4.929, "in_range": true, "type": "眼科", "area": "巴黎时韵大厦"}, {"name": "BREAD etc(襄阳南路店)", "address": "襄阳南路500号", "lat": 31.205636, "lon": 121.45788, "distance": 4.929, "in_range": true, "type": "西餐厅", "area": "中山医院"}, {"name": "Y+YOGA", "address": "嘉善路307号A01", "lat": 31.206275, "lon": 121.460338, "distance": 4.972, "in_range": true, "type": "瑜伽", "area": "嘉御庭"}];
+
+var map = L.map('container').setView(CENTER, 14);
+
+// OpenStreetMap tiles (free, no key)
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap'
+}).addTo(map);
+
+// Center marker
+L.marker(CENTER, {title:'瓦肆VAS EST'}).addTo(map)
+ .bindPopup('<b>🎯 瓦肆VAS EST</b><br>龙腾大道2266号3号楼').openPopup();
+
+// 5km circle
+L.circle(CENTER, {radius:5000, color:'#ff9800', weight:2, fillOpacity:0.05}).addTo(map);
+
+// Points
+var list = document.getElementById('list');
+POINTS.forEach(function(p, i) {
+    var m = L.marker([p.lat, p.lon], {title:p.name}).addTo(map)
+     .bindPopup('<b>' + p.name + '</b><br>' + p.address + '<br>' + p.type + '<br>距离: ' + p.distance + 'km');
+
+    var li = document.createElement('li');
+    li.innerHTML = '<span class="d">' + p.distance + 'km</span> <span class="n">' + p.name + '</span><br><span class="a">' + p.address + ' | ' + p.type + '</span>';
+    li.onclick = function(){ map.setView([p.lat, p.lon], 16); m.openPopup(); };
+    list.appendChild(li);
+});
+</script>
+</body>
+</html>

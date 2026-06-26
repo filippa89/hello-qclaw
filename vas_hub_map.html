@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>交通枢纽附近点位 · 瓦肆VAS EST</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif}
+#container{width:100vw;height:100vh}
+#panel{position:absolute;top:10px;left:10px;z-index:999;background:rgba(0,0,0,0.85);color:#fff;padding:12px 16px;border-radius:10px;font-size:12px;width:310px;max-height:95vh;overflow-y:auto}
+#panel h3{margin-bottom:4px;font-size:14px;color:#ff9800}
+#panel .summary{color:#aaa;margin-bottom:2px;font-size:11px}
+#panel .legend{display:flex;flex-wrap:wrap;gap:4px 10px;margin:6px 0;font-size:10px}
+#panel .legend span{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:3px;vertical-align:middle}
+#panel ul{list-style:none;margin-top:4px}
+#panel li{padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.07);line-height:1.35;cursor:pointer;transition:background .2s}
+#panel li:hover{background:rgba(255,255,255,0.05)}
+#panel li .d{font-weight:bold;font-size:11px}
+#panel li .n{font-weight:bold;font-size:12px}
+#panel li .a{color:#aaa;font-size:10px}
+@media(max-width:600px){#panel{width:240px;font-size:11px}}
+</style>
+</head>
+<body>
+<div id="container"></div>
+<div id="panel">
+<h3>🚄 交通枢纽附近点位</h3>
+<div class="summary">46个点位距高铁/机场 ≤3km</div>
+<div class="legend" id="legend"></div>
+<hr style="border-color:rgba(255,255,255,0.1);margin:4px 0">
+<ul id="list"></ul>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+var CENTER = [31.161753, 121.465197];
+var HUBS = [{"name": "上海虹桥站", "lat": 31.19371, "lon": 121.320416}, {"name": "虹桥机场T2", "lat": 31.193321, "lon": 121.326929}, {"name": "上海站", "lat": 31.249574, "lon": 121.455708}, {"name": "上海南站", "lat": 31.153153, "lon": 121.429476}, {"name": "浦东国际机场", "lat": 31.262514, "lon": 121.651544}, {"name": "上海西站", "lat": 31.262245, "lon": 121.401}];
+var POINTS = [{"name": "REAL瑞格医疗美容(徐汇店)", "address": "漕宝路111号", "lat": 31.167798, "lon": 121.42453, "type": "医学美容", "area": "天运综合大楼", "nearest_hub": "上海南站", "hub_dist": 1.7}, {"name": "REAL瑞格医疗美容(徐汇店)", "address": "漕宝路111号1F", "lat": 31.167798, "lon": 121.42453, "type": "医学美容", "area": "天运综合大楼", "nearest_hub": "上海南站", "hub_dist": 1.7}, {"name": "颜大医疗美容", "address": "江宁路396号1F", "lat": 31.234228, "lon": 121.452954, "type": "医学美容", "area": "江宁路", "nearest_hub": "上海站", "hub_dist": 1.73}, {"name": "光大银行(静安支行)", "address": "新闸路1133号1F", "lat": 31.233367, "lon": 121.454252, "type": "私人银行", "area": "", "nearest_hub": "上海站", "hub_dist": 1.81}, {"name": "琅悦月子会所", "address": "西康路572号", "lat": 31.234729, "lon": 121.447002, "type": "月子中心", "area": "同乐坊", "nearest_hub": "上海站", "hub_dist": 1.85}, {"name": "静安瑞吉酒店", "address": "北京西路1008号B1", "lat": 31.23106, "lon": 121.456177, "type": "五星酒店/豪华", "area": "", "nearest_hub": "上海站", "hub_dist": 2.06}, {"name": "MQueen SKin肌肤定制管家", "address": "凤阳路572号", "lat": 31.232838, "lon": 121.465339, "type": "美容护肤", "area": "凤阳路", "nearest_hub": "上海站", "hub_dist": 2.07}, {"name": "悦美格医疗美容", "address": "凤阳路570号1F", "lat": 31.232853, "lon": 121.4656, "type": "医疗美容", "area": "凤阳路", "nearest_hub": "上海站", "hub_dist": 2.08}, {"name": "江依南医疗美容", "address": "凤阳路560号1F", "lat": 31.232895, "lon": 121.465776, "type": "医疗美容", "area": "长征医院", "nearest_hub": "上海站", "hub_dist": 2.09}, {"name": "顺风大酒店", "address": "西藏中路500号7F", "lat": 31.236368, "lon": 121.474404, "type": "中餐厅", "area": "第一百货", "nearest_hub": "上海站", "hub_dist": 2.31}, {"name": "中喜优牙口腔(人民广场店)", "address": "南京西路288号创兴金融中心二层20204单元", "lat": 31.232195, "lon": 121.470322, "type": "齿科", "area": "创兴金融中心", "nearest_hub": "上海站", "hub_dist": 2.38}, {"name": "七重天老上海餐厅(南京东路店)", "address": "南京东路627号7F", "lat": 31.234663, "lon": 121.477072, "type": "中餐厅", "area": "南京东路", "nearest_hub": "上海站", "hub_dist": 2.62}, {"name": "三日月鮨割蒸料理", "address": "九江路700号2F", "lat": 31.234554, "lon": 121.477, "type": "西餐厅", "area": "人民广场", "nearest_hub": "上海站", "hub_dist": 2.62}, {"name": "南新雅大酒店", "address": "九江路700号25楼", "lat": 31.234554, "lon": 121.477, "type": "五星酒店/高档", "area": "", "nearest_hub": "上海站", "hub_dist": 2.62}, {"name": "南新雅大酒店", "address": "九江路700号7F", "lat": 31.234554, "lon": 121.477, "type": "五星酒店/高档", "area": "", "nearest_hub": "上海站", "hub_dist": 2.62}, {"name": "上海丽笙精选海仑宾馆", "address": "南京东路505号2F", "lat": 31.234663, "lon": 121.477072, "type": "五星酒店/高档", "area": "", "nearest_hub": "上海站", "hub_dist": 2.62}, {"name": "上海丽笙精选海仑宾馆", "address": "南京东路505号2F", "lat": 31.234663, "lon": 121.477072, "type": "五星酒店/高档", "area": "", "nearest_hub": "上海站", "hub_dist": 2.62}, {"name": "上海丽笙精选海仑宾馆", "address": "南京东路505号3F", "lat": 31.234663, "lon": 121.477072, "type": "五星酒店/高档", "area": "", "nearest_hub": "上海站", "hub_dist": 2.62}, {"name": "上海丽笙精选海仑宾馆", "address": "南京东路505号4F", "lat": 31.234663, "lon": 121.477072, "type": "五星酒店/高档", "area": "", "nearest_hub": "上海站", "hub_dist": 2.62}, {"name": "上海丽笙精选海仑宾馆", "address": "南京东路505号7F", "lat": 31.234663, "lon": 121.477072, "type": "五星酒店/高档", "area": "", "nearest_hub": "上海站", "hub_dist": 2.62}, {"name": "格莱美科技美肤中心", "address": "胶州路186号1F", "lat": 31.227603, "lon": 121.444881, "type": "美容护肤", "area": "静安寺", "nearest_hub": "上海站", "hub_dist": 2.65}, {"name": "科瓦齿科", "address": "成都北路199号11F", "lat": 31.227009, "lon": 121.466677, "type": "齿科", "area": "恒利国际大厦", "nearest_hub": "上海站", "hub_dist": 2.72}, {"name": "粤港潮楼", "address": "九江路600号4F", "lat": 31.234612, "lon": 121.478334, "type": "中餐厅", "area": "永安百货", "nearest_hub": "上海站", "hub_dist": 2.72}, {"name": "gaga(兴业太古汇店)", "address": "南京西路789号LG2", "lat": 31.225244, "lon": 121.450973, "type": "西餐厅", "area": "上海兴业太古汇", "nearest_hub": "上海站", "hub_dist": 2.74}, {"name": "瑞尔齿科", "address": "南京西路1168号4F", "lat": 31.225244, "lon": 121.450973, "type": "齿科", "area": "中信泰富广场", "nearest_hub": "上海站", "hub_dist": 2.74}, {"name": "鹿园 MOOSE(静安店)", "address": "南京西路1225号4F", "lat": 31.225244, "lon": 121.450973, "type": "中餐厅", "area": "锦沧文华广场", "nearest_hub": "上海站", "hub_dist": 2.74}, {"name": "GRAVITY HAIR 地心引力", "address": "南京西路1371号", "lat": 31.225244, "lon": 121.450973, "type": "美容美发", "area": "南京西路", "nearest_hub": "上海站", "hub_dist": 2.74}, {"name": "SKIN PARADISE美学中心(仙乐斯广场店)", "address": "南京西路388号B1", "lat": 31.225244, "lon": 121.450973, "type": "美容美发", "area": "仙乐斯广场", "nearest_hub": "上海站", "hub_dist": 2.74}, {"name": "苏浙汇", "address": "南京西路288号3F", "lat": 31.225244, "lon": 121.450973, "type": "中餐厅", "area": "廖创兴金融中心", "nearest_hub": "上海站", "hub_dist": 2.74}, {"name": "苏浙汇", "address": "南京西路288号3F", "lat": 31.225244, "lon": 121.450973, "type": "中餐厅", "area": "廖创兴金融中心", "nearest_hub": "上海站", "hub_dist": 2.74}, {"name": "新荣记", "address": "南京西路688号2F", "lat": 31.225244, "lon": 121.450973, "type": "中餐厅", "area": "恒基688广场", "nearest_hub": "上海站", "hub_dist": 2.74}, {"name": "上海新世界丽笙大酒店", "address": "南京西路88号7F", "lat": 31.225244, "lon": 121.450973, "type": "五星酒店/豪华", "area": "", "nearest_hub": "上海站", "hub_dist": 2.74}, {"name": "浦发银行", "address": "南京西路242号", "lat": 31.225244, "lon": 121.450973, "type": "私人银行", "area": "", "nearest_hub": "上海站", "hub_dist": 2.74}, {"name": "mufmuf の食生活", "address": "南京西路1376号2F", "lat": 31.225166, "lon": 121.450758, "type": "西餐厅", "area": "上海商城", "nearest_hub": "上海站", "hub_dist": 2.75}, {"name": "空中花园", "address": "南京西路1376号7F", "lat": 31.225166, "lon": 121.450758, "type": "其它", "area": "上海商城", "nearest_hub": "上海站", "hub_dist": 2.75}, {"name": "云庐小雅", "address": "南京西路1399号2F", "lat": 31.225121, "lon": 121.450651, "type": "中餐厅", "area": "南京西路", "nearest_hub": "上海站", "hub_dist": 2.76}, {"name": "办公区", "address": "南京西路1618号9F", "lat": 31.225121, "lon": 121.450651, "type": "联合办公室", "area": "久光百货", "nearest_hub": "上海站", "hub_dist": 2.76}, {"name": "上海百乐门精品酒店", "address": "南京西路1728号12F", "lat": 31.225121, "lon": 121.450651, "type": "四星酒店/舒适", "area": "", "nearest_hub": "上海站", "hub_dist": 2.76}, {"name": "中国银行", "address": "南京西路1377号3F", "lat": 31.225146, "lon": 121.450721, "type": "私人银行", "area": "", "nearest_hub": "上海站", "hub_dist": 2.76}, {"name": "Rina丽娜牛排馆(静安店) ", "address": "铜仁路146号1F", "lat": 31.224924, "lon": 121.45062, "type": "西餐厅", "area": "铜仁路", "nearest_hub": "上海站", "hub_dist": 2.78}, {"name": "樱花美睫·美甲(静安晶品店)", "address": "愚园路68号3F", "lat": 31.225692, "lon": 121.446449, "type": "美容护肤", "area": "晶品购物广场", "nearest_hub": "上海站", "hub_dist": 2.8}, {"name": "宏安瑞士大酒店", "address": "愚园路1号1F", "lat": 31.224827, "lon": 121.447118, "type": "五星酒店/豪华", "area": "", "nearest_hub": "上海站", "hub_dist": 2.87}, {"name": "1/10 COFFEE ROASTER(九江路店)", "address": "九江路501号1F", "lat": 31.235362, "lon": 121.482035, "type": "咖啡", "area": "九江路", "nearest_hub": "上海站", "hub_dist": 2.96}, {"name": "德必商业广场", "address": "九江路501号", "lat": 31.235362, "lon": 121.482035, "type": "商场", "area": "德必商业广场", "nearest_hub": "上海站", "hub_dist": 2.96}, {"name": "德必商业广场", "address": "九江路501号", "lat": 31.235362, "lon": 121.482035, "type": "商场", "area": "德必商业广场", "nearest_hub": "上海站", "hub_dist": 2.96}, {"name": "德必商业广场", "address": "九江路501号", "lat": 31.235362, "lon": 121.482035, "type": "商场", "area": "德必商业广场", "nearest_hub": "上海站", "hub_dist": 2.96}];
+var COLORS = {"上海虹桥站": "#e74c3c", "虹桥机场T2": "#e67e22", "上海站": "#2980b9", "上海南站": "#27ae60", "浦东国际机场": "#8e44ad", "上海西站": "#16a085"};
+
+var map = L.map('container').setView([31.18, 121.45], 12);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap'
+}).addTo(map);
+
+// Center marker
+L.circleMarker(CENTER, {radius:8, color:'#ff9800', fillColor:'#ff9800', fillOpacity:1, weight:3}).addTo(map)
+ .bindPopup('<b>🎯 瓦肆VAS EST</b><br>龙腾大道2266号3号楼');
+
+// Hub markers (larger, colored)
+var hubMarkers = {};
+HUBS.forEach(function(h) {
+    var color = COLORS[h.name] || '#999';
+    var icon = L.divIcon({
+        html: '<div style="background:'+color+';color:#fff;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:bold;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.4)">🚉 '+h.name+'</div>',
+        iconSize: [0,0],
+        iconAnchor: [0,0]
+    });
+    var m = L.marker([h.lat, h.lon], {icon:icon}).addTo(map);
+    L.circle([h.lat, h.lon], {radius:3000, color:color, weight:1, fillOpacity:0.03, dashArray:'5,5'}).addTo(map);
+    hubMarkers[h.name] = m;
+});
+
+// Point markers
+var grouped = {};
+POINTS.forEach(function(p) { var h = p.nearest_hub; if(!grouped[h]) grouped[h] = []; grouped[h].push(p); });
+
+var list = document.getElementById('list');
+var legend = document.getElementById('legend');
+
+Object.keys(grouped).forEach(function(hubName) {
+    var color = COLORS[hubName] || '#999';
+    var items = grouped[hubName];
+    legend.innerHTML += '<span style="background:'+color+'"></span> '+hubName+' ('+items.length+'个)';
+    
+    items.forEach(function(p) {
+        var m = L.circleMarker([p.lat, p.lon], {radius:5, color:color, fillColor:color, fillOpacity:0.8, weight:2}).addTo(map)
+         .bindPopup('<b>'+p.name+'</b><br>'+p.address+'<br>'+p.type+'<br>距'+hubName+': '+p.hub_dist+'km');
+        
+        var li = document.createElement('li');
+        li.innerHTML = '<span class="d" style="color:'+color+'">'+p.hub_dist+'km</span> <span class="n">'+p.name+'</span><br><span class="a">'+p.address+' | '+p.type+' | 近'+hubName+'</span>';
+        li.onclick = function(){ map.setView([p.lat, p.lon], 15); m.openPopup(); };
+        list.appendChild(li);
+    });
+});
+</script>
+</body>
+</html>
