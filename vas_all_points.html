@@ -9,7 +9,11 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'PingFang SC','Microsoft YaHei',sans-serif}
 #container{width:100vw;height:100vh}
-#panel{position:absolute;top:10px;left:10px;z-index:999;background:rgba(0,0,0,0.85);color:#fff;padding:12px 16px;border-radius:10px;font-size:11px;width:300px;max-height:95vh;overflow-y:auto}
+#panel{position:absolute;top:10px;left:10px;z-index:999;background:rgba(0,0,0,0.85);color:#fff;padding:12px 16px;border-radius:10px;font-size:11px;width:300px;max-height:95vh;overflow-y:auto;transition:transform .3s}
+#panel.collapsed{transform:translateX(-320px)}
+#panel-toggle{position:absolute;top:10px;left:10px;z-index:1000;width:36px;height:36px;background:rgba(0,0,0,0.85);color:#ff9800;border:none;border-radius:8px;font-size:18px;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1}
+#panel-close{position:absolute;top:6px;right:6px;z-index:1001;width:28px;height:28px;background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+#panel-close:hover{background:rgba(255,255,255,0.2)}
 #panel h3{margin-bottom:2px;font-size:14px;color:#ff9800}
 #panel .sum{color:#aaa;font-size:11px;margin-bottom:4px}
 #panel ul{list-style:none}
@@ -22,12 +26,13 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif}
 #panel li.out5{border-left:3px solid #3b82f6}
 .leaflet-tooltip.marker-label{background:transparent;border:none;box-shadow:none;color:#222;font-size:10px;font-weight:bold;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff;padding:0;white-space:nowrap}
 .leaflet-tooltip.marker-label::before{display:none}
-@media(max-width:600px){#panel{width:240px}}
+@media(max-width:600px){#panel{width:250px}#panel-toggle{display:flex}}
 </style>
 </head>
 <body>
 <div id="container"></div>
-<div id="panel"><h3>📍 全部点位分布</h3>
+<button id="panel-toggle" title="展开列表">☰</button>
+<div id="panel"><button id="panel-close" title="收起面板">✕</button><h3>📍 全部点位分布</h3>
 <div class="sum" id="sum"></div><ul id="list"></ul></div>
 <script src="https://cdn.bootcdn.net/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
@@ -59,6 +64,13 @@ POINTS.forEach(function(p){
 });
 document.getElementById('sum').innerHTML = '共<b> 116 </b>个点位 | 🟢 5km内 <b>'+inCount+'</b> 个 | 🔵 5km外 <b>'+outCount+'</b> 个';
 map.fitBounds([[31.1,121.35],[31.3,121.7]]);
+// Panel toggle for mobile
+var panel = document.getElementById('panel');
+var toggleBtn = document.getElementById('panel-toggle');
+var closeBtn = document.getElementById('panel-close');
+closeBtn.onclick = function(){ panel.classList.add('collapsed'); toggleBtn.style.display = 'flex'; };
+toggleBtn.onclick = function(){ panel.classList.remove('collapsed'); toggleBtn.style.display = 'none'; };
+if(window.innerWidth<=600) panel.classList.add('collapsed');
 </script>
 </body>
 </html>
