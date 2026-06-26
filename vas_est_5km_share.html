@@ -9,23 +9,37 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'PingFang SC','Microsoft YaHei',sans-serif}
 #container{width:100vw;height:100vh}
-#panel{position:absolute;top:10px;left:10px;z-index:999;background:rgba(0,0,0,0.82);color:#fff;padding:14px 18px;border-radius:10px;font-size:12px;width:290px;max-height:95vh;overflow-y:auto}
-#panel h3{margin-bottom:4px;font-size:14px;color:#ff9800}
+#panel{position:absolute;top:10px;left:10px;z-index:999;background:rgba(0,0,0,0.82);color:#fff;padding:14px 18px;border-radius:10px;font-size:12px;width:290px;max-height:95vh;overflow-y:auto;transition:transform .3s}
+#panel.collapsed{transform:translateX(-310px)}
+#panel-toggle{position:absolute;top:10px;left:10px;z-index:1000;width:36px;height:36px;background:rgba(0,0,0,0.82);color:#ff9800;border:none;border-radius:8px;font-size:18px;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1}
+#panel-close{position:absolute;top:6px;right:6px;z-index:1001;width:28px;height:28px;background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+#panel-close:hover{background:rgba(255,255,255,0.2)}
+#panel h3{margin-bottom:4px;font-size:14px;color:#ff9800;padding-right:28px}
 #panel .summary{color:#aaa;margin-bottom:8px;font-size:11px}
 #panel ul{list-style:none}
 #panel li{padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07);line-height:1.4;cursor:pointer;transition:background .2s}
 #panel li:hover{background:rgba(255,255,255,0.05)}
 #panel li .d{color:#4caf50;font-weight:bold;font-size:11px}
 #panel li .n{font-weight:bold;font-size:12px}
-#panel li .a{color:#aaa;font-size:10px.leaflet-tooltip.marker-label{background:transparent;border:none;box-shadow:none;color:#222;font-size:10px;font-weight:bold;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff;padding:0;white-space:nowrap}
+#panel li .a{color:#aaa;font-size:10px}
+.leaflet-tooltip.marker-label{background:transparent!important;border:none!important;box-shadow:none!important;color:#222;font-size:10px;font-weight:bold;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff;padding:0;white-space:nowrap}
 .leaflet-tooltip.marker-label::before{display:none}
+@media(max-width:600px){
+    #panel{width:250px;font-size:11px}
+    #panel-toggle{display:flex}
+    #panel.collapsed+#panel-toggle{left:auto;right:10px}
 }
-@media(max-width:600px){#panel{width:240px;font-size:11px}}
 </style>
 </head>
 <body>
 <div id="container"></div>
-<div id="panel"><h3>📍 瓦肆VAS EST 周边5km</h3><div class="summary">共 <b>30</b> 个点位 | 点击名称定位</div><ul id="list"></ul></div>
+<button id="panel-toggle" title="展开列表">☰</button>
+<div id="panel">
+<button id="panel-close" title="收起面板">✕</button>
+<h3>📍 瓦肆VAS EST 周边5km</h3>
+<div class="summary">共 <b>30</b> 个点位 | 点击名称定位</div>
+<ul id="list"></ul>
+</div>
 
 <script src="https://cdn.bootcdn.net/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
@@ -34,7 +48,7 @@ var POINTS = [{"name": "il colpo bis·程Studio(AI PLAZA西岸凤巢店)", "addr
 
 var map = L.map('container').setView(CENTER, 14);
 
-// OpenStreetMap tiles (free, no key)
+// Amap tiles
 L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
     maxZoom: 18,
     attribution: '&copy; 高德地图'
@@ -42,7 +56,7 @@ L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=
 
 // Center marker
 L.marker(CENTER, {title:'瓦肆VAS EST'}).addTo(map)
- .bindPopup('<b>🎯 瓦肆VAS EST</b><br>龙腾大道2266号3号楼').openPopup().bindTooltip(p.name,{permanent:true,direction:"top",offset:[0,-5],className:"marker-label",opacity:0.9});
+ .bindPopup('<b>🎯 瓦肆VAS EST</b><br>龙腾大道2266号3号楼').openPopup().bindTooltip('瓦肆VAS EST',{permanent:true,direction:"top",offset:[0,-5],className:"marker-label",opacity:0.9});
 
 // 5km circle
 L.circle(CENTER, {radius:5000, color:'#ff9800', weight:2, fillOpacity:0.05}).addTo(map);
@@ -58,6 +72,16 @@ POINTS.forEach(function(p, i) {
     li.onclick = function(){ map.setView([p.lat, p.lon], 16); m.openPopup(); };
     list.appendChild(li);
 });
+
+// Panel toggle for mobile
+var panel = document.getElementById('panel');
+var toggleBtn = document.getElementById('panel-toggle');
+var closeBtn = document.getElementById('panel-close');
+function closePanel() { panel.classList.add('collapsed'); toggleBtn.style.display = 'flex'; }
+toggleBtn.onclick = function() { panel.classList.remove('collapsed'); toggleBtn.style.display = 'none'; };
+closeBtn.onclick = closePanel;
+// Auto-collapse on narrow screens
+if (window.innerWidth <= 600) { panel.classList.add('collapsed'); }
 </script>
 </body>
 </html>
