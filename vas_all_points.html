@@ -43,9 +43,10 @@ L.circle(CENTER,{radius:5000,color:'#ff9800',weight:2,fillOpacity:0.04,dashArray
 var inCount = 0, outCount = 0;
 var list = document.getElementById('list');
 POINTS.forEach(function(p){
-    var color = p.in5km ? '#4caf50' : '#888';
-    var size = p.in5km ? 6 : 4;
-    var m = L.circleMarker([p.lat,p.lon],{radius:size,color:color,fillColor:color,fillOpacity:0.7,weight:1}).addTo(map)
+    var color = p.in5km ? '#4caf50' : '#555555';
+    var size = p.in5km ? 6 : 5;
+    var fop = p.in5km ? 0.7 : 0.85;
+    var m = L.circleMarker([p.lat,p.lon],{radius:size,color:color,fillColor:color,fillOpacity:fop,weight:1.5,opacity:0.9}).addTo(map)
      .bindPopup('<b>'+p.name+'</b><br>'+p.address+'<br>'+p.type+(p.area?' | '+p.area:'')+'<br>距瓦肆: '+p.dist+'km '+(p.in5km?'✅':''))
      .bindTooltip(p.name,{permanent:true,direction:'top',offset:[0,-5],className:'marker-label',opacity:0.9});
     if(p.in5km) inCount++; else outCount++;
