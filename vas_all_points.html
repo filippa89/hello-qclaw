@@ -45,6 +45,7 @@ L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=
 L.circleMarker(CENTER,{radius:8,color:'#ff9800',fillColor:'#ff9800',fillOpacity:1,weight:3}).addTo(map).bindPopup('<b>🎯 瓦肆VAS EST</b>');
 L.circle(CENTER,{radius:5000,color:'#ff9800',weight:2,fillOpacity:0.04,dashArray:'6,4'}).addTo(map);
 
+POINTS.sort(function(a,b){ return a.dist - b.dist; });
 var inCount = 0, outCount = 0;
 var list = document.getElementById('list');
 POINTS.forEach(function(p){
