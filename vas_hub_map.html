@@ -42,9 +42,9 @@ var COLORS = {"上海虹桥站": "#e74c3c", "虹桥机场T2": "#e67e22", "上海
 
 var map = L.map('container').setView([31.18, 121.45], 12);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap'
+L.tileLayer('https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
+    maxZoom: 18,
+    attribution: '&copy; 高德地图'
 }).addTo(map);
 
 // Center marker
