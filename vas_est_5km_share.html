@@ -17,7 +17,9 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif}
 #panel li:hover{background:rgba(255,255,255,0.05)}
 #panel li .d{color:#4caf50;font-weight:bold;font-size:11px}
 #panel li .n{font-weight:bold;font-size:12px}
-#panel li .a{color:#aaa;font-size:10px}
+#panel li .a{color:#aaa;font-size:10px.leaflet-tooltip.marker-label{background:transparent;border:none;box-shadow:none;color:#222;font-size:10px;font-weight:bold;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff;padding:0;white-space:nowrap}
+.leaflet-tooltip.marker-label::before{display:none}
+}
 @media(max-width:600px){#panel{width:240px;font-size:11px}}
 </style>
 </head>
@@ -40,7 +42,7 @@ L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=
 
 // Center marker
 L.marker(CENTER, {title:'瓦肆VAS EST'}).addTo(map)
- .bindPopup('<b>🎯 瓦肆VAS EST</b><br>龙腾大道2266号3号楼').openPopup();
+ .bindPopup('<b>🎯 瓦肆VAS EST</b><br>龙腾大道2266号3号楼').openPopup().bindTooltip(p.name,{permanent:true,direction:"top",offset:[0,-5],className:"marker-label",opacity:0.9});
 
 // 5km circle
 L.circle(CENTER, {radius:5000, color:'#ff9800', weight:2, fillOpacity:0.05}).addTo(map);
@@ -49,7 +51,7 @@ L.circle(CENTER, {radius:5000, color:'#ff9800', weight:2, fillOpacity:0.05}).add
 var list = document.getElementById('list');
 POINTS.forEach(function(p, i) {
     var m = L.marker([p.lat, p.lon], {title:p.name}).addTo(map)
-     .bindPopup('<b>' + p.name + '</b><br>' + p.address + '<br>' + p.type + '<br>距离: ' + p.distance + 'km');
+     .bindPopup('<b>' + p.name + '</b><br>' + p.address + '<br>' + p.type + '<br>距离: ' + p.distance + 'km').bindTooltip(p.name,{permanent:true,direction:"top",offset:[0,-5],className:"marker-label",opacity:0.9});
 
     var li = document.createElement('li');
     li.innerHTML = '<span class="d">' + p.distance + 'km</span> <span class="n">' + p.name + '</span><br><span class="a">' + p.address + ' | ' + p.type + '</span>';

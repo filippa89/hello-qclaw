@@ -20,6 +20,8 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif}
 #panel li .a{color:#aaa;font-size:9px}
 #panel li.in5{border-left:3px solid #4caf50}
 #panel li.out5{border-left:3px solid #666}
+.leaflet-tooltip.marker-label{background:transparent;border:none;box-shadow:none;color:#222;font-size:10px;font-weight:bold;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff;padding:0;white-space:nowrap}
+.leaflet-tooltip.marker-label::before{display:none}
 @media(max-width:600px){#panel{width:240px}}
 </style>
 </head>
@@ -44,7 +46,8 @@ POINTS.forEach(function(p){
     var color = p.in5km ? '#4caf50' : '#888';
     var size = p.in5km ? 6 : 4;
     var m = L.circleMarker([p.lat,p.lon],{radius:size,color:color,fillColor:color,fillOpacity:0.7,weight:1}).addTo(map)
-     .bindPopup('<b>'+p.name+'</b><br>'+p.address+'<br>'+p.type+(p.area?' | '+p.area:'')+'<br>距瓦肆: '+p.dist+'km '+(p.in5km?'✅':''));
+     .bindPopup('<b>'+p.name+'</b><br>'+p.address+'<br>'+p.type+(p.area?' | '+p.area:'')+'<br>距瓦肆: '+p.dist+'km '+(p.in5km?'✅':''))
+     .bindTooltip(p.name,{permanent:true,direction:'top',offset:[0,-5],className:'marker-label',opacity:0.9});
     if(p.in5km) inCount++; else outCount++;
     var cls = p.in5km ? 'in5' : 'out5';
     var li = document.createElement('li');
